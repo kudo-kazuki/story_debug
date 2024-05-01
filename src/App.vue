@@ -1,17 +1,7 @@
 <script setup lang="ts">
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import Side from './components/Side.vue'
 import Main from './components/Main.vue'
-
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
-
-const imageFiles = ref<string[]>([])
-
-onMounted(async () => {
-    imageFiles.value = await (window as any).ipcRenderer.invoke(
-        'get-image-files',
-    )
-    console.log('imageFiles', imageFiles.value)
-})
 
 const appRef = ref<HTMLElement | null>(null)
 const setWindowHeight = () => {
@@ -49,10 +39,14 @@ onUnmounted(() => {
 
     &__aside {
         flex-shrink: 0;
+        height: 100%;
+        overflow-y: auto;
     }
 
     &__main {
         width: 100%;
+        height: 100%;
+        overflow-y: auto;
     }
 }
 </style>
