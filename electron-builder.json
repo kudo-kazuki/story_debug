@@ -1,0 +1,11 @@
+{
+    "appId": "com.example.your-app",
+    "files": ["dist/electron/main/main.cjs", "dist/**/*", "images/**/*"],
+    "extraResources": [
+        {
+            "from": "./images",
+            "to": "images",
+            "filter": ["**/*"]
+        }
+    ]
+}

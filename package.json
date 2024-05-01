@@ -1,29 +1,35 @@
 {
-  "name": "storydebug",
-  "private": true,
-  "version": "0.0.0",
-  "main": "dist/electron/main/main.cjs",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "app:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "app:build": "tsc && cd dist/electron/main && (if exist main.cjs del main.cjs) && ren main.js main.cjs && cd ../../.. && electron-builder",
-    "app:preview": "tsc && cd dist/electron/main && (if exist main.cjs del main.cjs) && ren main.js main.cjs && cd ../../.. && electron ."
-  },
-  "dependencies": {
-    "vue": "^3.4.21"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.4",
-    "concurrently": "^8.2.2",
-    "electron": "^30.0.1",
-    "electron-builder": "^24.13.3",
-    "electron-reloader": "^1.2.3",
-    "prettier": "^3.2.5",
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0",
-    "vue-tsc": "^2.0.6",
-    "wait-on": "^7.2.0"
-  }
+    "name": "storydebug",
+    "private": true,
+    "version": "0.0.0",
+    "main": "dist/electron/main/main.cjs",
+    "scripts": {
+        "start": "cross-env NODE_ENV=development electron .",
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "app:dev": "tsc && concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+        "app:build": "vite build && tsc && cd dist/electron/main && (if exist main.cjs del main.cjs) && ren main.js main.cjs && cd ../../.. && electron-builder",
+        "app:preview": "vite build && tsc && cd dist/electron/main && (if exist main.cjs del main.cjs) && ren main.js main.cjs && cd ../../.. && electron ."
+    },
+    "build": {
+        "extends": "./electron-builder.json"
+    },
+    "dependencies": {
+        "vue": "^3.4.21"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.0.4",
+        "concurrently": "^8.2.2",
+        "cross-env": "^7.0.3",
+        "electron": "^30.0.1",
+        "electron-builder": "^24.13.3",
+        "electron-reloader": "^1.2.3",
+        "prettier": "^3.2.5",
+        "sass": "^1.76.0",
+        "typescript": "^5.2.2",
+        "vite": "^5.2.0",
+        "vue-tsc": "^2.0.6",
+        "wait-on": "^7.2.0"
+    }
 }

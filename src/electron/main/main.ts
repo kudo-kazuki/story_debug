@@ -3,7 +3,16 @@ import { app, BrowserWindow, screen, ipcMain } from 'electron'
 import path from 'path'
 import fs from 'fs'
 
-const isDev = process.env.npm_lifecycle_event === 'app:dev' ? true : false
+let NODE_ENV: string = 'production'
+if ('npm_lifecycle_event' in process.env) {
+    NODE_ENV =
+        process.env.npm_lifecycle_event === 'app:dev'
+            ? 'development'
+            : 'preview'
+}
+
+const isDev = NODE_ENV === 'development' ? true : false
+const isPreview = NODE_ENV === 'preview' ? true : false
 
 if (isDev) {
     try {
@@ -22,6 +31,7 @@ function createWindow() {
             preload: join(__dirname, '../preload/preload.js'),
             // Autofillを無効にする
             disableBlinkFeatures: 'Autofill',
+            contextIsolation: true,
         },
     })
 
@@ -30,9 +40,9 @@ function createWindow() {
         isDev ? 'http://localhost:5173' : join(__dirname, '../../index.html'),
     )
     // Open the DevTools.
-    if (isDev) {
-        mainWindow.webContents.openDevTools()
-    }
+    // if (isDev) {
+    mainWindow.webContents.openDevTools()
+    // }
     mainWindow.setMenuBarVisibility(false)
 }
 
@@ -57,11 +67,23 @@ app.on('window-all-closed', () => {
     }
 })
 
+let imagesDir
+if (isDev || isPreview) {
+    // 開発時のパス
+    imagesDir = path.resolve(process.cwd(), 'images')
+} else {
+    // ビルド時のパス
+    imagesDir = path.resolve(process.resourcesPath, 'images')
+}
+
+console.log('imagesDir', imagesDir)
+
 ipcMain.handle('get-image-files', async () => {
-    const imagesDir = path.join(__dirname, 'images')
     const files = await fs.promises.readdir(imagesDir)
-    const imageFiles = files.filter((file: string) =>
-        /\.(jpg|jpeg|png|gif)$/i.test(file),
-    )
+    const imageFiles = files
+        .filter((file: string) => /\.(jpg|jpeg|png|gif)$/i.test(file))
+        .map((file: string) =>
+            isDev ? `images/${file}` : `file://${path.join(imagesDir, file)}`,
+        ) // 絶対パスに変換
     return imageFiles
 })
