@@ -25,7 +25,11 @@
         "module": "CommonJS",
         "noEmit": false,
         "allowJs": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"]
+        }
     },
     "include": [
         "src/**/*.ts",

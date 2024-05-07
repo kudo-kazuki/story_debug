@@ -76,14 +76,60 @@ if (isDev || isPreview) {
     imagesDir = path.resolve(process.resourcesPath, 'images')
 }
 
-console.log('imagesDir', imagesDir)
+console.log('imagesDir:', imagesDir)
 
-ipcMain.handle('get-image-files', async () => {
-    const files = await fs.promises.readdir(imagesDir)
+const TexturesDir = imagesDir + '\\Story\\Textures'
+
+const BackgroundDir = TexturesDir + '\\Background'
+console.log('BackgroundDir:', BackgroundDir)
+ipcMain.handle('get-background-images', async () => {
+    const files = await fs.promises.readdir(BackgroundDir)
     const imageFiles = files
         .filter((file: string) => /\.(jpg|jpeg|png|gif)$/i.test(file))
         .map((file: string) =>
-            isDev ? `images/${file}` : `file://${path.join(imagesDir, file)}`,
+            isDev
+                ? `images/Story/Textures/Background/${file}`
+                : `file://${path.join(BackgroundDir, file)}`,
         ) // 絶対パスに変換
     return imageFiles
+})
+
+const EmoticonDir = TexturesDir + '\\Emoticon'
+console.log('EmoticonDir:', EmoticonDir)
+ipcMain.handle('get-emotion-images', async () => {
+    const files = await fs.promises.readdir(EmoticonDir)
+    const imageFiles = files
+        .filter((file: string) => /\.(jpg|jpeg|png|gif)$/i.test(file))
+        .map((file: string) =>
+            isDev
+                ? `images/Story/Textures/Emoticon/${file}`
+                : `file://${path.join(EmoticonDir, file)}`,
+        ) // 絶対パスに変換
+    return imageFiles
+})
+
+const CharacterDir = TexturesDir + '\\Character'
+console.log('CharacterDir:', CharacterDir)
+
+interface CharacterImages {
+    [key: number | string]: string[]
+}
+
+ipcMain.handle('get-character-images', async () => {
+    const dirs = await fs.promises.readdir(CharacterDir)
+    const characterImages: CharacterImages = {}
+    for (const dir of dirs) {
+        const files = await fs.promises.readdir(path.join(CharacterDir, dir))
+        const imageFiles = files
+            .filter((file: string) => /\.(jpg|jpeg|png|gif)$/i.test(file))
+            .filter((file: string) => !new RegExp(`^${dir}\.png$`).test(file)) // dir.pngというファイルを除外
+            .map((file: string) =>
+                isDev
+                    ? `images/Story/Textures/Character/${dir}/${file}`
+                    : `file://${path.join(CharacterDir + '\\' + dir, file)}`,
+            ) // 絶対パスに変換
+
+        characterImages[dir] = imageFiles
+    }
+    return characterImages
 })

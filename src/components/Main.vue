@@ -1,21 +1,14 @@
 <script setup lang="ts">
-import { getFilenameFromPath } from '../utils'
-import { onMounted, ref } from 'vue'
+import { getFilenameFromPath } from '@/utils'
+import { useMainStore } from '@/stores/mainStore'
 
-const imageFiles = ref<string[]>([])
-
-onMounted(async () => {
-    imageFiles.value = await (window as any).ipcRenderer.invoke(
-        'get-image-files',
-    )
-    console.log('imageFiles', imageFiles.value)
-})
+const store = useMainStore()
 </script>
 
 <template>
     <div class="Main">
         <ul>
-            <li v-for="file in imageFiles" :key="file">
+            <li v-for="file in store.backgroundImages" :key="file">
                 <img :src="file" alt="" width="100%" />
                 <br />
                 {{ getFilenameFromPath(file) }}
@@ -24,7 +17,7 @@ onMounted(async () => {
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .Main {
     background-color: #fff;
 }
