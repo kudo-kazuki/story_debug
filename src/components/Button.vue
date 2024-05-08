@@ -27,11 +27,41 @@ const props = withDefaults(defineProps<Props>(), {
 </template>
 
 <style lang="scss" scoped>
+$size-styles: (
+    'l': (
+        'fonst-size': 32px,
+        'padding': 16px 24px,
+    ),
+    'm': (
+        'fonst-size': 20px,
+        'padding': 12px 20px,
+    ),
+    's': (
+        'fonst-size': 14px,
+        'padding': 8px 12px,
+    ),
+);
+
+$color-styles: (
+    'blue': (
+        'color': #fff,
+        'background-color': blue,
+        'hover-color': #fff,
+        'hover-background-color': blue,
+    ),
+    'black': (
+        'color': #fff,
+        'background-color': #111,
+        'hover-color': #fff,
+        'hover-background-color': #111,
+    ),
+);
+
 .Button {
     color: #fff;
     padding: 8px 12px;
     font-size: 14px;
-    border-radius: 8px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
 
@@ -39,8 +69,23 @@ const props = withDefaults(defineProps<Props>(), {
         opacity: 0.9;
     }
 
-    &--black {
-        background-color: #222;
+    @each $size, $style in $size-styles {
+        &--#{$size} {
+            font-size: map-get($style, 'font-size');
+            padding: map-get($style, 'padding');
+        }
+    }
+
+    @each $color, $style in $color-styles {
+        &--#{$color} {
+            color: map-get($style, 'color');
+            background-color: map-get($style, 'background-color');
+
+            &:hover {
+                color: map-get($style, 'hover-color');
+                background-color: map-get($style, 'hover-background-color');
+            }
+        }
     }
 }
 </style>

@@ -78,9 +78,7 @@ if (isDev || isPreview) {
 
 console.log('imagesDir:', imagesDir)
 
-const TexturesDir = imagesDir + '\\Story\\Textures'
-
-const BackgroundDir = TexturesDir + '\\Background'
+const BackgroundDir = imagesDir + '\\Background'
 console.log('BackgroundDir:', BackgroundDir)
 ipcMain.handle('get-background-images', async () => {
     const files = await fs.promises.readdir(BackgroundDir)
@@ -88,13 +86,13 @@ ipcMain.handle('get-background-images', async () => {
         .filter((file: string) => /\.(jpg|jpeg|png|gif)$/i.test(file))
         .map((file: string) =>
             isDev
-                ? `images/Story/Textures/Background/${file}`
+                ? `images/Background/${file}`
                 : `file://${path.join(BackgroundDir, file)}`,
         ) // 絶対パスに変換
     return imageFiles
 })
 
-const EmoticonDir = TexturesDir + '\\Emoticon'
+const EmoticonDir = imagesDir + '\\Emoticon'
 console.log('EmoticonDir:', EmoticonDir)
 ipcMain.handle('get-emotion-images', async () => {
     const files = await fs.promises.readdir(EmoticonDir)
@@ -102,13 +100,13 @@ ipcMain.handle('get-emotion-images', async () => {
         .filter((file: string) => /\.(jpg|jpeg|png|gif)$/i.test(file))
         .map((file: string) =>
             isDev
-                ? `images/Story/Textures/Emoticon/${file}`
+                ? `images/Emoticon/${file}`
                 : `file://${path.join(EmoticonDir, file)}`,
         ) // 絶対パスに変換
     return imageFiles
 })
 
-const CharacterDir = TexturesDir + '\\Character'
+const CharacterDir = imagesDir + '\\Character'
 console.log('CharacterDir:', CharacterDir)
 
 interface CharacterImages {
@@ -125,7 +123,7 @@ ipcMain.handle('get-character-images', async () => {
             .filter((file: string) => !new RegExp(`^${dir}\.png$`).test(file)) // dir.pngというファイルを除外
             .map((file: string) =>
                 isDev
-                    ? `images/Story/Textures/Character/${dir}/${file}`
+                    ? `images/Character/${dir}/${file}`
                     : `file://${path.join(CharacterDir + '\\' + dir, file)}`,
             ) // 絶対パスに変換
 

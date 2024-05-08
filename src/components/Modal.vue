@@ -5,6 +5,7 @@ import Button from '@/components/Button.vue'
 interface Props {
     title: string
     size?: 'l' | 'm' | 's'
+    isShow?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -19,23 +20,27 @@ const close = () => {
 </script>
 
 <template>
-    <section class="Modal">
-        <div class="Modal__overlay" @click="close()"></div>
-        <div class="Modal__inner">
-            <header class="Modal__header">
-                <h1>{{ title }}</h1>
-                <button class="Modal__closeButton" @click="close()">×</button>
-            </header>
-            <main class="Modal__body">
-                <slot name="body" />
-            </main>
-            <footer class="Modal__footer">
-                <slot name="footer">
-                    <button>×閉じる</button>
-                </slot>
-            </footer>
-        </div>
-    </section>
+    <transition name="fade">
+        <section v-if="isShow" class="Modal">
+            <div class="Modal__overlay" @click="close()"></div>
+            <div class="Modal__inner">
+                <header class="Modal__header">
+                    <h1>{{ title }}</h1>
+                    <button class="Modal__closeButton" @click="close()">
+                        ×
+                    </button>
+                </header>
+                <main class="Modal__body">
+                    <slot name="body" />
+                </main>
+                <footer class="Modal__footer">
+                    <slot name="footer">
+                        <Button text="×閉じる" color="gray" @click="close()" />
+                    </slot>
+                </footer>
+            </div>
+        </section>
+    </transition>
 </template>
 
 <style lang="scss" scoped>
@@ -77,11 +82,12 @@ const close = () => {
         position: relative;
         text-align: center;
         padding: 12px 24px;
+        border-bottom: 1px solid #ccc;
 
         h1 {
-            font-size: 18px;
+            font-size: 24px;
             line-height: 1.4;
-            color: #222;
+            color: #111;
         }
     }
 
@@ -105,5 +111,33 @@ const close = () => {
             color: #a01f46;
         }
     }
+
+    &__body {
+        height: 100%;
+        overflow-y: auto;
+        padding: 24px;
+        color: #111;
+    }
+
+    &__footer {
+        display: flex;
+        justify-content: center;
+        padding: 12px 24px;
+    }
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s;
 }
 </style>

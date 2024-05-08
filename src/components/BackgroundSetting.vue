@@ -16,12 +16,12 @@ const store = useMainStore()
             />
         </div>
         <Modal
-            v-if="store.isOpenBackgroundSetting"
+            :isShow="store.isOpenBackgroundSetting"
             title="背景画像設定"
             @close="store.closeBackgroundSetting"
         >
             <template #body>aaaa</template>
-            <template #footer> aaaaaaa </template>
+            <!-- <template #footer></template> -->
         </Modal>
     </div>
 </template>
