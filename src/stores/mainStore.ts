@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 
 interface MainState {
+    isLoadingAnimation: boolean
     backgroundImages: string[] | null
     emoticonImages: string[] | null
     characterImages: { [key: number | string]: string[] } | null
@@ -13,6 +14,7 @@ interface MainState {
 export const useMainStore = defineStore({
     id: 'main',
     state: (): MainState => ({
+        isLoadingAnimation: true,
         backgroundImages: null,
         emoticonImages: null,
         characterImages: null,
@@ -23,6 +25,16 @@ export const useMainStore = defineStore({
         isOpenBackgroundSetting: false,
     }),
     actions: {
+        showLoadingAnimation() {
+            console.log('showLoadingAnimation')
+            this.isLoadingAnimation = true
+        },
+
+        hideLoadingAnimation() {
+            console.log('hideLoadingAnimation')
+            this.isLoadingAnimation = false
+        },
+
         setBackgroundImages(images: string[]) {
             this.backgroundImages = images
             console.log('this.backgroundImages', this.backgroundImages)
@@ -49,6 +61,10 @@ export const useMainStore = defineStore({
 
         closeBackgroundSetting() {
             this.isOpenBackgroundSetting = false
+        },
+
+        setActiveBackgroundIndex(index: number) {
+            this.activeBackgroundIndex = index
         },
     },
 })

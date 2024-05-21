@@ -34,33 +34,51 @@ const changePage = (page: number) => {
 
 <template>
     <div class="Pagination">
-        <ol class="Pagination__items">
-            <li v-for="page in totalPage" :key="page" class="Pagination__item">
-                <button
-                    class="Pagination__itemButton"
-                    :class="{
-                        'Pagination__itemButton--active': page === currentPage,
-                    }"
-                    @click="changePage(page)"
+        <div class="Pagination__inner">
+            <ol
+                class="Pagination__items"
+                :class="[{ 'Pagination__items--left': totalPage >= 30 }]"
+            >
+                <li
+                    v-for="page in totalPage"
+                    :key="page"
+                    class="Pagination__item"
                 >
-                    {{ page }}
-                </button>
-            </li>
-        </ol>
+                    <button
+                        class="Pagination__itemButton"
+                        :class="{
+                            'Pagination__itemButton--active':
+                                page === currentPage,
+                        }"
+                        @click="changePage(page)"
+                    >
+                        {{ page }}
+                    </button>
+                </li>
+            </ol>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .Pagination {
+    width: 100%;
     background-color: #3f0e40;
     color: #fff;
     padding: 8px;
-    display: flex;
-    justify-content: center;
+
+    &__inner {
+        overflow-x: auto;
+    }
 
     &__items {
         display: flex;
         gap: 12px;
+        justify-content: center;
+
+        &--left {
+            justify-content: flex-start;
+        }
     }
 
     &__itemButton {
@@ -80,6 +98,10 @@ const changePage = (page: number) => {
             font-weight: bold;
             background-color: yellow;
             cursor: default;
+        }
+
+        &:not(&--active):hover {
+            background-color: #f1f1f1;
         }
     }
 }

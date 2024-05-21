@@ -3,6 +3,7 @@ import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useMainStore } from '@/stores/mainStore'
 import Footer from '@/components/Footer.vue'
 import Main from '@/components/Main.vue'
+import Loading from '@/components/Loading.vue'
 
 const store = useMainStore()
 
@@ -12,6 +13,7 @@ const setWindowHeight = () => {
         appRef.value.style.height = `${window.innerHeight}px`
     }
 }
+
 onMounted(async () => {
     const backgroundImages = await (window as any).ipcRenderer.invoke(
         'get-background-images',
@@ -45,6 +47,7 @@ onUnmounted(() => {
         <footer class="App__footer">
             <Footer />
         </footer>
+        <Loading />
     </div>
 </template>
 
