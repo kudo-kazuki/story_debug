@@ -2,7 +2,9 @@
 import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import { getFilenameFromPath } from '@/utils'
 import { useMainStore } from '@/stores/mainStore'
+import Box from '@/components/Box.vue'
 import Button from '@/components/Button.vue'
+import Dropdown from '@/components/Dropdown.vue'
 import Modal from '@/components/Modal.vue'
 import Pagination from '@/components/Pagination.vue'
 
@@ -35,8 +37,6 @@ const loadImage = (url: string) => {
         const img = new Image()
         img.src = url
 
-        console.log('img', img)
-
         if (img.complete) {
             resolve(img)
         } else {
@@ -60,12 +60,20 @@ watch(
 
 <template>
     <div class="BackgroundSetting">
-        <div>
-            背景画像：<Button
-                text="aaa"
-                @click="store.openBackgroundSetting()"
-            />
-        </div>
+        <Box>
+            <p class="BackgroundSetting__title">背景</p>
+            <div class="BackgroundSetting__form">
+                <Button
+                    class="BackgroundSetting__button"
+                    text="背景選択"
+                    @click="store.openBackgroundSetting()"
+                />
+                <Dropdown
+                    :items="store.backgroundImagesDropdownItems"
+                    v-model="store.activeBackgroundIndex"
+                />
+            </div>
+        </Box>
         <Modal
             :isShow="store.isOpenBackgroundSetting"
             title="背景画像設定"
@@ -80,7 +88,8 @@ watch(
                         :class="[
                             {
                                 'BackgroundSetting__item--active':
-                                    index === store.activeBackgroundIndex,
+                                    (currentPage - 1) * PER_PAGE + index ===
+                                    store.activeBackgroundIndex,
                             },
                         ]"
                     >
@@ -89,11 +98,16 @@ watch(
                             :class="[
                                 {
                                     'BackgroundSetting__itemButton--active':
-                                        index === store.activeBackgroundIndex,
+                                        (currentPage - 1) * PER_PAGE + index ===
+                                        store.activeBackgroundIndex,
                                 },
                             ]"
                             @click="
-                                store.setActiveBackgroundIndex(index),
+                                store.setActiveBackgroundIndex(
+                                    currentPage,
+                                    PER_PAGE,
+                                    index,
+                                ),
                                     store.closeBackgroundSetting()
                             "
                         >
@@ -108,7 +122,8 @@ watch(
                             :class="[
                                 {
                                     'BackgroundSetting__itemName--active':
-                                        index === store.activeBackgroundIndex,
+                                        (currentPage - 1) * PER_PAGE + index ===
+                                        store.activeBackgroundIndex,
                                 },
                             ]"
                             >{{ getFilenameFromPath(item) }}</span
@@ -130,6 +145,24 @@ watch(
 
 <style lang="scss" scoped>
 .BackgroundSetting {
+    &__title {
+        font-weight: bold;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    &__form {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        column-gap: 12px;
+        margin-top: 12px;
+    }
+
+    & &__button {
+        flex-shrink: 0;
+    }
+
     &__items {
         display: flex;
         flex-wrap: wrap;
@@ -149,8 +182,10 @@ watch(
         cursor: pointer;
         border: 3px solid transparent;
 
-        &:hover {
+        &:hover,
+        &--active {
             border-color: red;
+            box-shadow: 0 0 6px red;
         }
     }
 

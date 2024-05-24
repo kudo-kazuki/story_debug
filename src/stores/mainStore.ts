@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { DropdownItem } from '@/types'
+import { getFilenameFromPath } from '@/utils'
 
 interface MainState {
     isLoadingAnimation: boolean
@@ -63,8 +65,22 @@ export const useMainStore = defineStore({
             this.isOpenBackgroundSetting = false
         },
 
-        setActiveBackgroundIndex(index: number) {
-            this.activeBackgroundIndex = index
+        setActiveBackgroundIndex(
+            currentPage: number,
+            perPage: number,
+            index: number,
+        ) {
+            this.activeBackgroundIndex = (currentPage - 1) * perPage + index
+        },
+    },
+    getters: {
+        backgroundImagesDropdownItems(): DropdownItem[] {
+            return this.backgroundImages
+                ? this.backgroundImages.map((image, index) => ({
+                      value: index,
+                      text: getFilenameFromPath(image),
+                  }))
+                : []
         },
     },
 })

@@ -5,6 +5,7 @@ interface Props {
     size?: 'l' | 'm' | 's'
     isActive?: boolean
     isDisabled?: boolean
+    icon?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
             { 'Button--active': isActive, 'Button--disabled': isDisabled },
         ]"
     >
+        <img v-if="icon" class="Button__icon" :src="icon" alt="" />
         {{ text }}
     </button>
 </template>
@@ -55,9 +57,18 @@ $color-styles: (
         'hover-color': #fff,
         'hover-background-color': #111,
     ),
+    'gray': (
+        'color': #111,
+        'background-color': #eee,
+        'hover-color': #fff,
+        'hover-background-color': #bbb,
+    ),
 );
 
 .Button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #fff;
     padding: 8px 12px;
     font-size: 14px;
@@ -86,6 +97,12 @@ $color-styles: (
                 background-color: map-get($style, 'hover-background-color');
             }
         }
+    }
+
+    &__icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
     }
 }
 </style>

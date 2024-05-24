@@ -30,6 +30,7 @@ ol {
 body {
     min-height: 100vh;
     line-height: 1.5;
+    font-family: 'Noto Sans JP';
 }
 h1,
 h2,
