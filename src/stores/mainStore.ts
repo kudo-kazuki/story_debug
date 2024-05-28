@@ -10,6 +10,7 @@ interface MainState {
     activeBackgroundIndex: number | null
     activeEmoticonIndex: number | null
     activeCharacterId: number | string | null
+    activeCharacterFaceIndex: number | null
     isOpenBackgroundSetting: boolean
 }
 
@@ -23,7 +24,7 @@ export const useMainStore = defineStore({
         activeBackgroundIndex: 0,
         activeEmoticonIndex: null,
         activeCharacterId: null,
-
+        activeCharacterFaceIndex: 0,
         isOpenBackgroundSetting: false,
     }),
     actions: {
@@ -81,6 +82,38 @@ export const useMainStore = defineStore({
                       text: getFilenameFromPath(image),
                   }))
                 : []
+        },
+
+        characterImagesDropdownItems(): DropdownItem[] {
+            let result: DropdownItem[] = []
+
+            if (this.characterImages) {
+                Object.keys(this.characterImages).forEach((id) => {
+                    result.push({
+                        value: id,
+                        text: id,
+                    })
+                })
+            }
+
+            return result
+        },
+
+        characterFacesDropdownItems(): DropdownItem[] {
+            let result: DropdownItem[] = []
+
+            if (this.characterImages && this.activeCharacterId) {
+                this.characterImages[this.activeCharacterId].forEach(
+                    (image, index) => {
+                        result.push({
+                            value: index,
+                            text: getFilenameFromPath(image),
+                        })
+                    },
+                )
+            }
+
+            return result
         },
     },
 })

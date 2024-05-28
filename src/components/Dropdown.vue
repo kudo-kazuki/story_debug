@@ -6,11 +6,11 @@ const props = withDefaults(defineProps<DropdownProps>(), {
     size: 's',
 })
 
-const model = defineModel<number | string>({
-    get: (value: number | string) => {
+const model = defineModel<number | string | null>({
+    get: (value: number | string | null) => {
         return value
     },
-    set: (value: number | string) => {
+    set: (value: number | string | null) => {
         return value
     },
 })

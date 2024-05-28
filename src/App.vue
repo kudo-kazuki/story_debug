@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useMainStore } from '@/stores/mainStore'
-import Footer from '@/components/Footer.vue'
+import Aside from '@/components/Aside.vue'
 import Main from '@/components/Main.vue'
 import Loading from '@/components/Loading.vue'
 
@@ -32,6 +32,7 @@ onMounted(async () => {
 
     await nextTick()
     setWindowHeight()
+    store.hideLoadingAnimation()
 })
 window.addEventListener('resize', setWindowHeight)
 onUnmounted(() => {
@@ -44,9 +45,10 @@ onUnmounted(() => {
         <main class="App__main">
             <Main />
         </main>
-        <footer class="App__footer">
-            <Footer />
-        </footer>
+        <aside class="App__aside">
+            <Aside />
+        </aside>
+
         <Loading />
     </div>
 </template>
@@ -54,14 +56,13 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .App {
     display: flex;
-    flex-direction: column;
+    flex-direction: row-reverse;
     background-color: #fff;
     height: 100vh;
     overflow: hidden;
 
-    &__footer {
+    &__aside {
         flex-shrink: 0;
-        width: 100%;
     }
 
     &__main {

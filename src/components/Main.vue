@@ -7,13 +7,18 @@ const store = useMainStore()
 
 <template>
     <div class="Main">
-        <ul>
-            <li v-for="file in store.backgroundImages" :key="file">
-                <img :src="file" alt="" width="100%" />
-                <br />
-                {{ getFilenameFromPath(file) }}
-            </li>
-        </ul>
+        <div
+            v-for="n in 2"
+            style="
+                background-color: #000;
+                padding: 20px 50px;
+                margin: 20px 0;
+                font-size: 30px;
+                color: #fff;
+            "
+        >
+            あああ
+        </div>
     </div>
 </template>
 

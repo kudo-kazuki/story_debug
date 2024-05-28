@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useMainStore } from '@/stores/mainStore'
 import Box from '@/components/Box.vue'
 import Button from '@/components/Button.vue'
 import Dropdown from '@/components/Dropdown.vue'
 
 const store = useMainStore()
+
+watch(
+    () => store.activeCharacterId,
+    () => {
+        store.activeCharacterFaceIndex = 0
+    },
+)
 </script>
 
 <template>
@@ -20,7 +27,8 @@ const store = useMainStore()
                     />
                     <Dropdown
                         class="CharacterSelect__dropdown"
-                        :items="store.backgroundImagesDropdownItems"
+                        :items="store.characterImagesDropdownItems"
+                        v-model="store.activeCharacterId"
                     />
                 </div>
                 <div class="CharacterSelect__selectWrap">
@@ -31,7 +39,8 @@ const store = useMainStore()
                     />
                     <Dropdown
                         class="CharacterSelect__dropdown"
-                        :items="store.backgroundImagesDropdownItems"
+                        :items="store.characterFacesDropdownItems"
+                        v-model="store.activeCharacterFaceIndex"
                     />
                 </div>
             </div>
