@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { DropdownItem } from '@/types'
+import { DropdownItem, DeviceItem, DevicePreviewItemProps } from '@/types'
 import { getFilenameFromPath } from '@/utils'
 
 interface MainState {
@@ -12,7 +12,50 @@ interface MainState {
     activeCharacterId: number | string | null
     activeCharacterFaceIndex: number | null
     isOpenBackgroundSetting: boolean
+    devicePreviewItems: DevicePreviewItemProps[]
 }
+
+export const deviceItems: DeviceItem = {
+    1: {
+        name: 'iPhoneSE',
+        width: 1476,
+        height: 2624,
+    },
+    2: {
+        name: 'iPhone12ProMax',
+        width: 1476,
+        height: 2624,
+    },
+    3: {
+        name: 'iPadPro',
+        width: 2000,
+        height: 2624,
+    },
+}
+
+const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
+    {
+        index: 0,
+        deviceId: 1,
+        characterId: null,
+        characterFaceIndex: 0,
+        backgroundImageIndex: 0,
+    },
+    {
+        index: 1,
+        deviceId: 2,
+        characterId: null,
+        characterFaceIndex: 0,
+        backgroundImageIndex: 0,
+    },
+    {
+        index: 2,
+        deviceId: 3,
+        characterId: null,
+        characterFaceIndex: 0,
+        backgroundImageIndex: 0,
+    },
+]
 
 export const useMainStore = defineStore({
     id: 'main',
@@ -26,6 +69,7 @@ export const useMainStore = defineStore({
         activeCharacterId: null,
         activeCharacterFaceIndex: 0,
         isOpenBackgroundSetting: false,
+        devicePreviewItems: defaultDevicePreviewItems,
     }),
     actions: {
         showLoadingAnimation() {
@@ -72,6 +116,10 @@ export const useMainStore = defineStore({
             index: number,
         ) {
             this.activeBackgroundIndex = (currentPage - 1) * perPage + index
+        },
+
+        deleteDevicePreviewItem(index: number) {
+            this.devicePreviewItems.splice(index, 1)
         },
     },
     getters: {

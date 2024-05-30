@@ -12,3 +12,23 @@ export interface DropdownProps {
     ariaLabel?: string
     placeholder?: string
 }
+
+export interface DeviceItem {
+    [key: number | string]: {
+        name: string
+        width: number
+        height: number
+    }
+}
+
+export interface DevicePreviewItemProps {
+    index: number
+    deviceId: number | string
+    characterId: number | string | null
+    characterFaceIndex: number | null
+    backgroundImageIndex: number
+    position?: 'left' | 'center' | 'right'
+    memo?: string | null
+    characterName?: string | null
+    message?: string | null
+}

@@ -9,10 +9,10 @@ const store = useMainStore()
 
 <template>
     <div class="Aside">
-        <div class="Aside__header">
-            <Button text="全コピ" color="gray" />
-        </div>
+        <div class="Aside__header"></div>
         <div class="Aside__inner">
+            <h1 class="Aside__heading">メッセージウインドウ</h1>
+            <Button text="全コピ" color="gray" />
             <div
                 v-for="n in 20"
                 style="
@@ -50,6 +50,14 @@ const store = useMainStore()
         overflow-y: scroll;
         padding: 0 12px 0 0;
         margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #fff;
+    }
+
+    &__heading {
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 12px;
     }
 }
 </style>
