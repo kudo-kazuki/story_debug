@@ -25,10 +25,14 @@ export interface DevicePreviewItemProps {
     index: number
     deviceId: number | string
     characterId: number | string | null
-    characterFaceIndex: number | null
+    faceIndex: number | null
     backgroundImageIndex: number
     position?: 'left' | 'center' | 'right'
     memo?: string | null
     characterName?: string | null
     message?: string | null
+}
+
+export interface BackgroundSettingProps {
+    devicePreviewItemIndex: number
 }

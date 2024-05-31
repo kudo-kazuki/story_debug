@@ -25,6 +25,11 @@ onMounted(async () => {
     )
     store.setEmoticonImages(emoticonImages)
 
+    const faceImages = await (window as any).ipcRenderer.invoke(
+        'get-face-images',
+    )
+    store.setFaceImages(faceImages)
+
     const characterImages = await (window as any).ipcRenderer.invoke(
         'get-character-images',
     )

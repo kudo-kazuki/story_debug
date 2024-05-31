@@ -6,12 +6,14 @@ interface MainState {
     isLoadingAnimation: boolean
     backgroundImages: string[] | null
     emoticonImages: string[] | null
-    characterImages: { [key: number | string]: string[] } | null
+    faceImages: { [key: number | string]: string[] } | null
+    characterImages: { [key: number | string]: string } | null
     activeBackgroundIndex: number | null
     activeEmoticonIndex: number | null
     activeCharacterId: number | string | null
-    activeCharacterFaceIndex: number | null
-    isOpenBackgroundSetting: boolean
+    activefaceIndex: number | null
+    openBackgroundSettingModalNumber: number | null
+    openCharacterSettingModalNumber: number | null
     devicePreviewItems: DevicePreviewItemProps[]
 }
 
@@ -38,21 +40,21 @@ const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
         index: 0,
         deviceId: 1,
         characterId: null,
-        characterFaceIndex: 0,
+        faceIndex: 0,
         backgroundImageIndex: 0,
     },
     {
         index: 1,
         deviceId: 2,
         characterId: null,
-        characterFaceIndex: 0,
+        faceIndex: 0,
         backgroundImageIndex: 0,
     },
     {
         index: 2,
         deviceId: 3,
         characterId: null,
-        characterFaceIndex: 0,
+        faceIndex: 0,
         backgroundImageIndex: 0,
     },
 ]
@@ -63,22 +65,22 @@ export const useMainStore = defineStore({
         isLoadingAnimation: true,
         backgroundImages: null,
         emoticonImages: null,
+        faceImages: null,
         characterImages: null,
         activeBackgroundIndex: 0,
         activeEmoticonIndex: null,
         activeCharacterId: null,
-        activeCharacterFaceIndex: 0,
-        isOpenBackgroundSetting: false,
+        activefaceIndex: 0,
+        openBackgroundSettingModalNumber: null,
+        openCharacterSettingModalNumber: null,
         devicePreviewItems: defaultDevicePreviewItems,
     }),
     actions: {
         showLoadingAnimation() {
-            console.log('showLoadingAnimation')
             this.isLoadingAnimation = true
         },
 
         hideLoadingAnimation() {
-            console.log('hideLoadingAnimation')
             this.isLoadingAnimation = false
         },
 
@@ -92,30 +94,54 @@ export const useMainStore = defineStore({
             console.log('this.emoticonImages', this.emoticonImages)
         },
 
-        setCharacterImages(images: { [key: number | string]: string[] }) {
-            this.characterImages = images
-
-            // オブジェクトのキーの配列を取得し、その最初のキーをactiveCharacterIdに設定
-            this.activeCharacterId = Object.keys(images)[0]
-
-            console.log('this.characterImages', this.characterImages)
-            console.log('this.activeCharacterId', this.activeCharacterId)
+        setFaceImages(images: { [key: number | string]: string[] }) {
+            this.faceImages = images
+            console.log('this.faceImages', this.faceImages)
         },
 
-        openBackgroundSetting() {
-            this.isOpenBackgroundSetting = true
+        setCharacterImages(images: { [key: number | string]: string }) {
+            this.characterImages = images
+            console.log('this.characterImages', this.characterImages)
+
+            // オブジェクトのキーの配列を取得し、その最初のキーをactiveCharacterIdに設定
+            const firstCharacterId = Object.keys(images)[0]
+            this.devicePreviewItems.forEach((item) => {
+                item.characterId = firstCharacterId
+            })
+        },
+
+        openBackgroundSetting(devicePreviewItemIndex: number | null = null) {
+            this.openBackgroundSettingModalNumber = devicePreviewItemIndex
         },
 
         closeBackgroundSetting() {
-            this.isOpenBackgroundSetting = false
+            this.openBackgroundSettingModalNumber = null
+        },
+
+        openCharacterSetting(devicePreviewItemIndex: number | null = null) {
+            this.openCharacterSettingModalNumber = devicePreviewItemIndex
+        },
+
+        closeCharacterSetting() {
+            this.openCharacterSettingModalNumber = null
         },
 
         setActiveBackgroundIndex(
+            devicePreviewItemIndex: number,
             currentPage: number,
             perPage: number,
             index: number,
         ) {
-            this.activeBackgroundIndex = (currentPage - 1) * perPage + index
+            this.devicePreviewItems[
+                devicePreviewItemIndex
+            ].backgroundImageIndex = (currentPage - 1) * perPage + index
+        },
+
+        setActiveCharacterId(
+            devicePreviewItemIndex: number,
+            id: number | string,
+        ) {
+            this.devicePreviewItems[devicePreviewItemIndex].characterId = id
         },
 
         deleteDevicePreviewItem(index: number) {
@@ -146,7 +172,7 @@ export const useMainStore = defineStore({
 
             return result
         },
-
+        /*
         characterFacesDropdownItems(): DropdownItem[] {
             let result: DropdownItem[] = []
 
@@ -163,5 +189,6 @@ export const useMainStore = defineStore({
 
             return result
         },
+        */
     },
 })

@@ -8,14 +8,15 @@ const store = useMainStore()
 
 const width = computed(() => {
     return {
-        width: `${store.devicePreviewItems.length * 492}px`,
+        width: `${store.devicePreviewItems.length * 300}px`,
     }
 })
+console.log('devicePreviewItems:', store.devicePreviewItems)
 </script>
 
 <template>
     <div class="DevicePreview">
-        <ul class="DevicePreview__items" :style="width">
+        <ol class="DevicePreview__items" :style="width">
             <li
                 class="DevicePreview__item"
                 v-for="(item, index) in store.devicePreviewItems"
@@ -23,7 +24,7 @@ const width = computed(() => {
             >
                 <DevicePreviewItem v-bind="item" :index="index" />
             </li>
-        </ul>
+        </ol>
     </div>
 </template>
 
@@ -35,10 +36,11 @@ const width = computed(() => {
     &__items {
         display: flex;
         height: 100%;
+        column-gap: 24px;
     }
 
     &__item {
-        width: 492px;
+        width: 300px;
         height: 100%;
     }
 }

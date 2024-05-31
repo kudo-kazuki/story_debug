@@ -2,7 +2,6 @@
 import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import { getFilenameFromPath } from '@/utils'
 import { useMainStore } from '@/stores/mainStore'
-import { BackgroundSettingProps } from '@/types'
 import Button from '@/components/Button.vue'
 import Dropdown from '@/components/Dropdown.vue'
 import Modal from '@/components/Modal.vue'
@@ -10,14 +9,23 @@ import Pagination from '@/components/Pagination.vue'
 
 const store = useMainStore()
 
-const props = withDefaults(defineProps<BackgroundSettingProps>(), {})
+interface Props {
+    devicePreviewItemIndex: number
+}
+
+const props = withDefaults(defineProps<Props>(), {})
 
 const PER_PAGE = 30
 const currentPage = ref(1)
-const displayBackgroundImages = computed(() => {
+const displayCharacterImages = computed(() => {
     const start = (currentPage.value - 1) * PER_PAGE
     const end = start + PER_PAGE
-    return (store.backgroundImages ?? []).slice(start, end)
+
+    if (store.characterImages) {
+        return (Object.keys(store.characterImages) ?? []).slice(start, end)
+    } else {
+        return []
+    }
 })
 
 const changePage = async (page: number) => {
@@ -48,7 +56,7 @@ const loadImage = (url: string) => {
 }
 
 watch(
-    displayBackgroundImages,
+    displayCharacterImages,
     async (newImages) => {
         // 全ての画像が読み込まれるのを待つ
         await Promise.all(newImages.map(loadImage))
@@ -58,90 +66,94 @@ watch(
     },
     { immediate: true },
 )
-
-console.log('devicePreviewItemIndex', props.devicePreviewItemIndex)
 </script>
 
 <template>
-    <div class="BackgroundSetting">
-        <div class="BackgroundSetting__form">
+    <div class="CharacterSetting">
+        <div class="CharacterSetting__form">
             <Button
-                class="BackgroundSetting__button"
-                text="背景選択"
-                @click="store.openBackgroundSetting(devicePreviewItemIndex)"
+                class="CharacterSetting__button"
+                text="キャラ選択"
+                @click="store.openCharacterSetting(devicePreviewItemIndex)"
             />
             <Dropdown
-                :items="store.backgroundImagesDropdownItems"
+                :items="store.characterImagesDropdownItems"
                 v-model="
-                    store.devicePreviewItems[devicePreviewItemIndex]
-                        .backgroundImageIndex
+                    store.devicePreviewItems[devicePreviewItemIndex].characterId
                 "
             />
         </div>
 
         <Modal
             :isShow="
-                store.openBackgroundSettingModalNumber ===
-                devicePreviewItemIndex
+                store.openCharacterSettingModalNumber === devicePreviewItemIndex
             "
-            title="背景画像設定"
-            @close="store.closeBackgroundSetting"
+            title="キャラクター選択"
+            @close="store.closeCharacterSetting"
         >
             <template #body>
-                <ul class="BackgroundSetting__items">
+                <ul class="CharacterSetting__items">
                     <li
-                        v-for="(item, index) in displayBackgroundImages"
-                        :key="index"
-                        class="BackgroundSetting__item"
+                        v-for="(id, index) in displayCharacterImages"
+                        :key="id"
+                        class="CharacterSetting__item"
                         :class="[
                             {
-                                'BackgroundSetting__item--active':
-                                    (currentPage - 1) * PER_PAGE + index ===
+                                'CharacterSetting__item--active':
+                                    id ===
                                     store.devicePreviewItems[
                                         devicePreviewItemIndex
-                                    ].backgroundImageIndex,
+                                    ].characterId,
                             },
                         ]"
                     >
                         <button
-                            class="BackgroundSetting__itemButton"
+                            class="CharacterSetting__itemButton"
                             :class="[
                                 {
-                                    'BackgroundSetting__itemButton--active':
-                                        (currentPage - 1) * PER_PAGE + index ===
+                                    'CharacterSetting__itemButton--active':
+                                        id ===
                                         store.devicePreviewItems[
                                             devicePreviewItemIndex
-                                        ].backgroundImageIndex,
+                                        ].characterId,
                                 },
                             ]"
                             @click="
-                                store.setActiveBackgroundIndex(
+                                store.setActiveCharacterId(
                                     devicePreviewItemIndex,
-                                    currentPage,
-                                    PER_PAGE,
-                                    index,
+                                    id,
                                 ),
-                                    store.closeBackgroundSetting()
+                                    store.closeCharacterSetting()
                             "
                         >
                             <img
-                                class="BackgroundSetting__itemImage"
-                                :src="item"
+                                class="CharacterSetting__itemImage"
+                                :src="
+                                    store.characterImages
+                                        ? store.characterImages[id]
+                                        : ''
+                                "
                                 alt=""
                             />
                         </button>
                         <span
-                            class="BackgroundSetting__itemName"
+                            class="CharacterSetting__itemName"
                             :class="[
                                 {
-                                    'BackgroundSetting__itemName--active':
-                                        (currentPage - 1) * PER_PAGE + index ===
+                                    'CharacterSetting__itemName--active':
+                                        id ===
                                         store.devicePreviewItems[
                                             devicePreviewItemIndex
-                                        ].backgroundImageIndex,
+                                        ].characterId,
                                 },
                             ]"
-                            >{{ getFilenameFromPath(item) }}</span
+                            >{{
+                                getFilenameFromPath(
+                                    store.characterImages
+                                        ? store.characterImages[id]
+                                        : '',
+                                )
+                            }}</span
                         >
                     </li>
                 </ul>
@@ -149,7 +161,11 @@ console.log('devicePreviewItemIndex', props.devicePreviewItemIndex)
             <template #footer>
                 <Pagination
                     :currentPage="currentPage"
-                    :totalItems="store.backgroundImages?.length || 0"
+                    :totalItems="
+                        store.characterImages
+                            ? Object.keys(store.characterImages).length
+                            : 0
+                    "
                     :perPage="PER_PAGE"
                     @update:page="changePage"
                 />
@@ -159,7 +175,7 @@ console.log('devicePreviewItemIndex', props.devicePreviewItemIndex)
 </template>
 
 <style lang="scss" scoped>
-.BackgroundSetting {
+.CharacterSetting {
     &__title {
         font-weight: bold;
         font-size: 16px;

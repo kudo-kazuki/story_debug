@@ -109,13 +109,13 @@ ipcMain.handle('get-emotion-images', async () => {
 const CharacterDir = imagesDir + '\\Character'
 console.log('CharacterDir:', CharacterDir)
 
-interface CharacterImages {
+interface FaceImages {
     [key: number | string]: string[]
 }
 
-ipcMain.handle('get-character-images', async () => {
+ipcMain.handle('get-face-images', async () => {
     const dirs = await fs.promises.readdir(CharacterDir)
-    const characterImages: CharacterImages = {}
+    const faceImages: FaceImages = {}
     for (const dir of dirs) {
         const files = await fs.promises.readdir(path.join(CharacterDir, dir))
         const imageFiles = files
@@ -127,7 +127,21 @@ ipcMain.handle('get-character-images', async () => {
                     : `file://${path.join(CharacterDir + '\\' + dir, file)}`,
             ) // 絶対パスに変換
 
-        characterImages[dir] = imageFiles
+        faceImages[dir] = imageFiles
+    }
+    return faceImages
+})
+
+interface CharacterImages {
+    [key: number | string]: string
+}
+ipcMain.handle('get-character-images', async () => {
+    const dirs = await fs.promises.readdir(CharacterDir)
+    const characterImages: CharacterImages = {}
+    for (const dir of dirs) {
+        characterImages[dir] = isDev
+            ? `images/Character/${dir}/${dir}.png`
+            : `file://${path.join(CharacterDir + '\\' + dir + '\\' + dir + '.png')}`
     }
     return characterImages
 })
