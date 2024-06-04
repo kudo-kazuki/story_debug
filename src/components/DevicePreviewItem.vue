@@ -5,6 +5,7 @@ import { useMainStore, deviceItems } from '@/stores/mainStore'
 import { DevicePreviewItemProps } from '@/types'
 import BackgroundSetting from '@/components/BackgroundSetting.vue'
 import CharacterSetting from '@/components/CharacterSetting.vue'
+import FaceSetting from '@/components/FaceSetting.vue'
 import device1 from '@/assets/devices/1.png'
 import device2 from '@/assets/devices/2.png'
 import device3 from '@/assets/devices/3.png'
@@ -59,6 +60,9 @@ const getDeviceImage = computed(() => {
             <ul>
                 <li>
                     <CharacterSetting :devicePreviewItemIndex="index" />
+                </li>
+                <li>
+                    <FaceSetting :devicePreviewItemIndex="index" />
                 </li>
                 <li>
                     <BackgroundSetting :devicePreviewItemIndex="index" />

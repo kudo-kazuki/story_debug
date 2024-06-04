@@ -14,6 +14,7 @@ interface MainState {
     activefaceIndex: number | null
     openBackgroundSettingModalNumber: number | null
     openCharacterSettingModalNumber: number | null
+    openFaceSettingModalNumber: number | null
     devicePreviewItems: DevicePreviewItemProps[]
 }
 
@@ -73,6 +74,7 @@ export const useMainStore = defineStore({
         activefaceIndex: 0,
         openBackgroundSettingModalNumber: null,
         openCharacterSettingModalNumber: null,
+        openFaceSettingModalNumber: null,
         devicePreviewItems: defaultDevicePreviewItems,
     }),
     actions: {
@@ -126,6 +128,14 @@ export const useMainStore = defineStore({
             this.openCharacterSettingModalNumber = null
         },
 
+        openFaceSetting(devicePreviewItemIndex: number | null = null) {
+            this.openFaceSettingModalNumber = devicePreviewItemIndex
+        },
+
+        closeFaceSetting() {
+            this.openFaceSettingModalNumber = null
+        },
+
         setActiveBackgroundIndex(
             devicePreviewItemIndex: number,
             currentPage: number,
@@ -142,6 +152,16 @@ export const useMainStore = defineStore({
             id: number | string,
         ) {
             this.devicePreviewItems[devicePreviewItemIndex].characterId = id
+        },
+
+        setActiveFaceIndex(
+            devicePreviewItemIndex: number,
+            currentPage: number,
+            perPage: number,
+            index: number,
+        ) {
+            this.devicePreviewItems[devicePreviewItemIndex].faceIndex =
+                (currentPage - 1) * perPage + index
         },
 
         deleteDevicePreviewItem(index: number) {
@@ -173,11 +193,11 @@ export const useMainStore = defineStore({
             return result
         },
         /*
-        characterFacesDropdownItems(): DropdownItem[] {
+        faceImagesDropdownItems(characterId: number): DropdownItem[] {
             let result: DropdownItem[] = []
 
-            if (this.characterImages && this.activeCharacterId) {
-                this.characterImages[this.activeCharacterId].forEach(
+            if (this.characterImages) {
+                this.characterImages[characterId].forEach(
                     (image, index) => {
                         result.push({
                             value: index,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, watch, nextTick } from 'vue'
+import { DropdownItem } from '@/types'
 import { getFilenameFromPath } from '@/utils'
 import { useMainStore } from '@/stores/mainStore'
 import Button from '@/components/Button.vue'
@@ -15,17 +16,46 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {})
 
+const activeCharacterId = ref<string | number | null>(
+    store.devicePreviewItems[props.devicePreviewItemIndex]?.characterId,
+)
+
+watch(
+    [
+        () => props.devicePreviewItemIndex,
+        () =>
+            store.devicePreviewItems[props.devicePreviewItemIndex]?.characterId,
+    ],
+    ([newIndex, newCharacterId]) => {
+        activeCharacterId.value = newCharacterId
+    },
+    { immediate: true },
+)
+
+const faceImagesDropdownItems = computed(() => {
+    let result: DropdownItem[] = []
+
+    if (store.faceImages && activeCharacterId.value) {
+        store.faceImages[activeCharacterId.value].forEach((image, index) => {
+            result.push({
+                value: index,
+                text: getFilenameFromPath(image),
+            })
+        })
+    }
+
+    return result
+})
+
 const PER_PAGE = 30
 const currentPage = ref(1)
-const displayCharacterImages = computed(() => {
+const displayFaceImages = computed(() => {
     const start = (currentPage.value - 1) * PER_PAGE
     const end = start + PER_PAGE
-
-    if (store.characterImages) {
-        return (Object.keys(store.characterImages) ?? []).slice(start, end)
-    } else {
-        return []
-    }
+    return (store.faceImages?.[activeCharacterId.value ?? ''] ?? []).slice(
+        start,
+        end,
+    )
 })
 
 const changePage = async (page: number) => {
@@ -56,7 +86,7 @@ const loadImage = (url: string) => {
 }
 
 watch(
-    displayCharacterImages,
+    displayFaceImages,
     async (newImages) => {
         // 全ての画像が読み込まれるのを待つ
         await Promise.all(newImages.map(loadImage))
@@ -66,105 +96,86 @@ watch(
     },
     { immediate: true },
 )
-
-//キャラクター変更したとき、表情のindexを0にする。（キャラによって表情の数が違うので一律0にリセットして整合性を保つ）
-watch(
-    () => store.devicePreviewItems[props.devicePreviewItemIndex]?.characterId,
-    (newCharacterId, oldCharacterId) => {
-        if (newCharacterId !== oldCharacterId) {
-            store.devicePreviewItems[props.devicePreviewItemIndex].faceIndex = 0
-        }
-    },
-    { immediate: true },
-)
 </script>
 
 <template>
-    <div class="CharacterSetting">
-        <div class="CharacterSetting__form">
+    <div class="FaceSetting">
+        <div class="FaceSetting__form">
             <Button
-                class="CharacterSetting__button"
-                text="キャラ選択"
-                @click="store.openCharacterSetting(devicePreviewItemIndex)"
+                class="FaceSetting__button"
+                text="表情選択"
+                @click="store.openFaceSetting(devicePreviewItemIndex)"
             />
             <Dropdown
-                :items="store.characterImagesDropdownItems"
+                :items="faceImagesDropdownItems"
                 v-model="
-                    store.devicePreviewItems[devicePreviewItemIndex].characterId
+                    store.devicePreviewItems[devicePreviewItemIndex].faceIndex
                 "
             />
         </div>
 
         <Modal
             :isShow="
-                store.openCharacterSettingModalNumber === devicePreviewItemIndex
+                store.openFaceSettingModalNumber === devicePreviewItemIndex
             "
-            title="キャラクター選択"
-            @close="store.closeCharacterSetting"
+            title="表情選択"
+            @close="store.closeFaceSetting"
         >
             <template #body>
-                <ul class="CharacterSetting__items">
+                <ul class="FaceSetting__items">
                     <li
-                        v-for="(id, index) in displayCharacterImages"
-                        :key="id"
-                        class="CharacterSetting__item"
+                        v-for="(item, index) in displayFaceImages"
+                        :key="index"
+                        class="FaceSetting__item"
                         :class="[
                             {
-                                'CharacterSetting__item--active':
-                                    id ===
+                                'FaceSetting__item--active':
+                                    (currentPage - 1) * PER_PAGE + index ===
                                     store.devicePreviewItems[
                                         devicePreviewItemIndex
-                                    ].characterId,
+                                    ].faceIndex,
                             },
                         ]"
                     >
                         <button
-                            class="CharacterSetting__itemButton"
+                            class="FaceSetting__itemButton"
                             :class="[
                                 {
-                                    'CharacterSetting__itemButton--active':
-                                        id ===
+                                    'FaceSetting__itemButton--active':
+                                        (currentPage - 1) * PER_PAGE + index ===
                                         store.devicePreviewItems[
                                             devicePreviewItemIndex
-                                        ].characterId,
+                                        ].faceIndex,
                                 },
                             ]"
                             @click="
-                                store.setActiveCharacterId(
+                                store.setActiveFaceIndex(
                                     devicePreviewItemIndex,
-                                    id,
+                                    currentPage,
+                                    PER_PAGE,
+                                    index,
                                 ),
-                                    store.closeCharacterSetting()
+                                    store.closeFaceSetting()
                             "
                         >
                             <img
-                                class="CharacterSetting__itemImage"
-                                :src="
-                                    store.characterImages
-                                        ? store.characterImages[id]
-                                        : ''
-                                "
+                                class="FaceSetting__itemImage"
+                                :src="item"
                                 alt=""
                             />
                         </button>
                         <span
-                            class="CharacterSetting__itemName"
+                            class="FaceSetting__itemName"
                             :class="[
                                 {
-                                    'CharacterSetting__itemName--active':
-                                        id ===
+                                    'FaceSetting__itemName--active':
+                                        (currentPage - 1) * PER_PAGE + index ===
                                         store.devicePreviewItems[
                                             devicePreviewItemIndex
-                                        ].characterId,
+                                        ].faceIndex,
                                 },
                             ]"
-                            >{{
-                                getFilenameFromPath(
-                                    store.characterImages
-                                        ? store.characterImages[id]
-                                        : '',
-                                )
-                            }}</span
+                            >{{ getFilenameFromPath(item) }}</span
                         >
                     </li>
                 </ul>
@@ -173,8 +184,8 @@ watch(
                 <Pagination
                     :currentPage="currentPage"
                     :totalItems="
-                        store.characterImages
-                            ? Object.keys(store.characterImages).length
+                        store.faceImages
+                            ? Object.keys(store.faceImages).length
                             : 0
                     "
                     :perPage="PER_PAGE"
@@ -186,7 +197,7 @@ watch(
 </template>
 
 <style lang="scss" scoped>
-.CharacterSetting {
+.FaceSetting {
     &__title {
         font-weight: bold;
         font-size: 16px;
