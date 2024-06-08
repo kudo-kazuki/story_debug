@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue'
 import { getFilenameFromPath } from '@/utils'
-import { useMainStore, deviceItems } from '@/stores/mainStore'
+import {
+    useMainStore,
+    deviceItems,
+    deviceDropDownItems,
+    characterPositionItems,
+} from '@/stores/mainStore'
 import { DevicePreviewItemProps } from '@/types'
 import BackgroundSetting from '@/components/BackgroundSetting.vue'
 import CharacterSetting from '@/components/CharacterSetting.vue'
 import FaceSetting from '@/components/FaceSetting.vue'
+import Dropdown from '@/components/Dropdown.vue'
+import RadioButtonGroup from '@/components/RadioButtonGroup.vue'
 import device1 from '@/assets/devices/1.png'
 import device2 from '@/assets/devices/2.png'
 import device3 from '@/assets/devices/3.png'
 
 const props = withDefaults(defineProps<DevicePreviewItemProps>(), {
-    position: 'center',
+    characterPosition: 'center',
 })
 
 const store = useMainStore()
@@ -20,7 +27,7 @@ const originWidth = 1476
 const originHeight = 2624
 
 const getDeviceImage = computed(() => {
-    switch (props.deviceId) {
+    switch (Number(store.devicePreviewItems[props.index].deviceId)) {
         case 1:
             return device1
         case 2:
@@ -29,11 +36,63 @@ const getDeviceImage = computed(() => {
             return device3
     }
 })
+
+const rootRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
+const deviceAreaRef = ref<HTMLElement | null>(null)
+const settingRef = ref<HTMLElement | null>(null)
+const memoWrapRef = ref<HTMLElement | null>(null)
+const characterAreaRef = ref<HTMLElement | null>(null)
+const deviceImageRef = ref<HTMLElement | null>(null)
+
+const setHeightDeviceArea = () => {
+    if (
+        !rootRef.value ||
+        !headerRef.value ||
+        !deviceAreaRef.value ||
+        !settingRef.value ||
+        !memoWrapRef.value
+    ) {
+        return
+    }
+
+    const style = window.getComputedStyle
+    const headerHeight =
+        headerRef.value.offsetHeight +
+        parseInt(style(headerRef.value).marginBottom)
+    const settingHeight =
+        settingRef.value.offsetHeight +
+        parseInt(style(settingRef.value).marginTop)
+    const memoWrapHeight =
+        memoWrapRef.value.offsetHeight +
+        parseInt(style(memoWrapRef.value).marginTop)
+
+    const totalHeight = headerHeight + settingHeight + memoWrapHeight
+
+    deviceAreaRef.value.style.height = `${rootRef.value.offsetHeight - totalHeight}px`
+
+    setTimeout(() => {
+        if (!deviceImageRef.value || !characterAreaRef.value) {
+            return
+        }
+        const width = parseFloat(getComputedStyle(deviceImageRef.value).width)
+        characterAreaRef.value.style.width = `${width}px`
+    }, 400)
+}
+
+onMounted(async () => {
+    await nextTick()
+    setHeightDeviceArea()
+    window.addEventListener('resize', setHeightDeviceArea)
+})
+onUnmounted(() => {
+    window.removeEventListener('resize', setHeightDeviceArea)
+})
 </script>
 
 <template>
-    <section class="DevicePreviewItem">
-        <div class="DevicePreviewItem__header">
+    <section class="DevicePreviewItem" ref="rootRef">
+        <div class="DevicePreviewItem__header" ref="headerRef">
             <span class="DevicePreviewItem__index">{{ index }}</span>
             <h1 class="DevicePreviewItem__deviceName">
                 {{ deviceItems[deviceId].name }}
@@ -45,7 +104,7 @@ const getDeviceImage = computed(() => {
                 ×
             </button>
         </div>
-        <div class="DevicePreviewItem__deviceArea">
+        <div class="DevicePreviewItem__deviceArea" ref="deviceAreaRef">
             <img
                 class="DevicePreviewItem__backgroundImage"
                 :src="
@@ -53,11 +112,37 @@ const getDeviceImage = computed(() => {
                         ? store.backgroundImages[backgroundImageIndex]
                         : ''
                 "
+                alt=""
             />
-            <img class="DevicePreviewItem__deviceImage" :src="getDeviceImage" />
+            <img
+                class="DevicePreviewItem__deviceImage"
+                :src="getDeviceImage"
+                alt=""
+                ref="deviceImageRef"
+            />
+
+            <div
+                class="DevicePreviewItem__characterArea"
+                ref="characterAreaRef"
+            >
+                <div class="DevicePreviewItem__characterWrap">
+                    <img
+                        class="DevicePreviewItem__characterImage"
+                        :class="[
+                            `DevicePreviewItem__characterImage--${characterPosition}`,
+                        ]"
+                        :src="
+                            store.characterImages && characterId !== null
+                                ? store.characterImages[characterId]
+                                : ''
+                        "
+                        alt=""
+                    />
+                </div>
+            </div>
         </div>
-        <div class="DevicePreviewItem__setting">
-            <ul>
+        <div class="DevicePreviewItem__setting" ref="settingRef">
+            <ul class="DevicePreviewItem__settingItems">
                 <li>
                     <CharacterSetting :devicePreviewItemIndex="index" />
                 </li>
@@ -67,7 +152,28 @@ const getDeviceImage = computed(() => {
                 <li>
                     <BackgroundSetting :devicePreviewItemIndex="index" />
                 </li>
+                <li>
+                    <Dropdown
+                        :items="deviceDropDownItems"
+                        v-model="store.devicePreviewItems[index].deviceId"
+                    />
+                </li>
+                <li>
+                    <RadioButtonGroup
+                        :items="characterPositionItems"
+                        v-model="
+                            store.devicePreviewItems[index].characterPosition
+                        "
+                        :name="`characterPosition${index}`"
+                    />
+                </li>
             </ul>
+        </div>
+        <div class="DevicePreviewItem__memoWrap" ref="memoWrapRef">
+            <textarea
+                class="DevicePreviewItem__memo"
+                v-model="store.devicePreviewItems[index].memo"
+            ></textarea>
         </div>
     </section>
 </template>
@@ -86,6 +192,7 @@ const getDeviceImage = computed(() => {
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-bottom: 4px;
     }
 
     &__index {
@@ -163,6 +270,69 @@ const getDeviceImage = computed(() => {
         position: relative;
         z-index: 1;
         height: 100%;
+    }
+
+    &__characterArea {
+        position: absolute;
+        top: 0;
+        height: 100%;
+    }
+
+    &__characterWrap {
+        position: relative;
+        margin: 0 auto;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__backgroundImage,
+    &__deviceImage,
+    &__characterArea {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    &__characterImage {
+        position: absolute;
+        bottom: 0;
+
+        &--left {
+            left: 0;
+        }
+
+        &--center {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        &--right {
+            right: 0;
+        }
+    }
+
+    &__setting {
+        margin-top: 12px;
+    }
+
+    &__settingItems {
+        display: flex;
+        flex-direction: column;
+        row-gap: 12px;
+    }
+
+    &__memoWrap {
+        margin-top: 12px;
+    }
+
+    &__memo {
+        width: 100%;
+        height: 100px;
+        min-height: 0;
+        background-color: #f9f9f9;
+        border: none;
+        border-radius: 10px;
+        padding: 16px;
+        font-size: 14px;
     }
 }
 </style>

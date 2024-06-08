@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia'
-import { DropdownItem, DeviceItem, DevicePreviewItemProps } from '@/types'
+import {
+    DropdownItem,
+    DeviceItem,
+    RadioButtonGroupItem,
+    DevicePreviewItemProps,
+} from '@/types'
 import { getFilenameFromPath } from '@/utils'
 
 interface MainState {
@@ -35,6 +40,29 @@ export const deviceItems: DeviceItem = {
         height: 2624,
     },
 }
+export const deviceDropDownItems: DropdownItem[] = Object.keys(deviceItems).map(
+    (key) => ({
+        value: key,
+        text: deviceItems[key].name,
+    }),
+)
+
+export const characterPositionItems: RadioButtonGroupItem[] = [
+    {
+        value: 'left',
+        text: '左',
+    },
+    {
+        value: 'center',
+        text: '中央',
+    },
+    {
+        value: 'right',
+        text: '右',
+    },
+]
+
+const memoDeafult = 'ここで炎のエフェクトを出します。\n音楽：〇〇の曲に切り替え'
 
 const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
     {
@@ -43,6 +71,8 @@ const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
         characterId: null,
         faceIndex: 0,
         backgroundImageIndex: 0,
+        characterPosition: 'center',
+        memo: memoDeafult,
     },
     {
         index: 1,
@@ -50,6 +80,8 @@ const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
         characterId: null,
         faceIndex: 0,
         backgroundImageIndex: 0,
+        characterPosition: 'center',
+        memo: memoDeafult,
     },
     {
         index: 2,
@@ -57,6 +89,8 @@ const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
         characterId: null,
         faceIndex: 0,
         backgroundImageIndex: 0,
+        characterPosition: 'center',
+        memo: memoDeafult,
     },
 ]
 

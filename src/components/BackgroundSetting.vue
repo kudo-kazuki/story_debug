@@ -171,7 +171,6 @@ console.log('devicePreviewItemIndex', props.devicePreviewItemIndex)
         align-items: center;
         justify-content: space-between;
         column-gap: 12px;
-        margin-top: 12px;
     }
 
     & &__button {

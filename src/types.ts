@@ -13,6 +13,16 @@ export interface DropdownProps {
     placeholder?: string
 }
 
+export interface RadioButtonGroupItem {
+    value: number | string
+    text: string | number
+}
+
+export interface RadioButtonGroupProps {
+    name: string
+    items: RadioButtonGroupItem[]
+}
+
 export interface DeviceItem {
     [key: number | string]: {
         name: string
@@ -27,7 +37,7 @@ export interface DevicePreviewItemProps {
     characterId: number | string | null
     faceIndex: number | null
     backgroundImageIndex: number
-    position?: 'left' | 'center' | 'right'
+    characterPosition?: 'left' | 'center' | 'right'
     memo?: string | null
     characterName?: string | null
     message?: string | null
