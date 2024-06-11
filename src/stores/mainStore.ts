@@ -72,6 +72,7 @@ const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
         faceIndex: 0,
         backgroundImageIndex: 0,
         characterPosition: 'center',
+        characterName: '結衣',
         memo: memoDeafult,
     },
     {
@@ -81,6 +82,7 @@ const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
         faceIndex: 0,
         backgroundImageIndex: 0,
         characterPosition: 'center',
+        characterName: '結衣',
         memo: memoDeafult,
     },
     {
@@ -90,6 +92,7 @@ const defaultDevicePreviewItems: DevicePreviewItemProps[] = [
         faceIndex: 0,
         backgroundImageIndex: 0,
         characterPosition: 'center',
+        characterName: '結衣',
         memo: memoDeafult,
     },
 ]

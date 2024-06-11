@@ -41,6 +41,8 @@ export interface DevicePreviewItemProps {
     memo?: string | null
     characterName?: string | null
     message?: string | null
+    isCharacterNameFocus?: boolean
+    isMessageFocus?: boolean
 }
 
 export interface BackgroundSettingProps {

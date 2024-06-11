@@ -24,7 +24,10 @@ const props = withDefaults(defineProps<DevicePreviewItemProps>(), {
 const store = useMainStore()
 
 const originWidth = 1476
-const originHeight = 2624
+const originHeight: number = 2624
+
+const characterSpacer = 352 /*キャラクター画像の上下のスペース*/
+const characterOriginSize = 1920
 
 const getDeviceImage = computed(() => {
     switch (Number(store.devicePreviewItems[props.index].deviceId)) {
@@ -44,6 +47,9 @@ const settingRef = ref<HTMLElement | null>(null)
 const memoWrapRef = ref<HTMLElement | null>(null)
 const characterAreaRef = ref<HTMLElement | null>(null)
 const deviceImageRef = ref<HTMLElement | null>(null)
+const characterImageRef = ref<HTMLElement | null>(null)
+
+const characterImagePositionBottom = ref(0)
 
 const setHeightDeviceArea = () => {
     if (
@@ -76,7 +82,16 @@ const setHeightDeviceArea = () => {
             return
         }
         const width = parseFloat(getComputedStyle(deviceImageRef.value).width)
+        const height = parseFloat(getComputedStyle(deviceImageRef.value).height)
         characterAreaRef.value.style.width = `${width}px`
+
+        const nowHeightRate = height / originHeight
+        const nowSpacerLength = characterSpacer * 2 * nowHeightRate
+        characterImagePositionBottom.value = nowSpacerLength / 2
+
+        if (characterImageRef.value) {
+            characterImageRef.value.style.height = `${height - nowSpacerLength}px`
+        }
     }, 400)
 }
 
@@ -136,10 +151,43 @@ onUnmounted(() => {
                                 ? store.characterImages[characterId]
                                 : ''
                         "
+                        :style="{
+                            bottom: `${characterImagePositionBottom}px`,
+                        }"
                         alt=""
+                        ref="characterImageRef"
                     />
                 </div>
             </div>
+            <input
+                class="DevicePreviewItem__characterName"
+                :class="[
+                    {
+                        'DevicePreviewItem__characterName--focus':
+                            store.devicePreviewItems[index]
+                                .isCharacterNameFocus,
+                    },
+                ]"
+                v-model="store.devicePreviewItems[index].characterName"
+                @focus="
+                    store.devicePreviewItems[index].isCharacterNameFocus = true
+                "
+                @blur="
+                    store.devicePreviewItems[index].isCharacterNameFocus = false
+                "
+            />
+            <textarea
+                class="DevicePreviewItem__message"
+                :class="[
+                    {
+                        'DevicePreviewItem__message--focus':
+                            store.devicePreviewItems[index].isMessageFocus,
+                    },
+                ]"
+                v-model="store.devicePreviewItems[index].message"
+                @focus="store.devicePreviewItems[index].isMessageFocus = true"
+                @blur="store.devicePreviewItems[index].isMessageFocus = false"
+            ></textarea>
         </div>
         <div class="DevicePreviewItem__setting" ref="settingRef">
             <ul class="DevicePreviewItem__settingItems">
@@ -276,6 +324,7 @@ onUnmounted(() => {
         position: absolute;
         top: 0;
         height: 100%;
+        overflow: hidden;
     }
 
     &__characterWrap {
@@ -295,6 +344,7 @@ onUnmounted(() => {
     &__characterImage {
         position: absolute;
         bottom: 0;
+        max-width: none;
 
         &--left {
             left: 0;
@@ -307,6 +357,28 @@ onUnmounted(() => {
 
         &--right {
             right: 0;
+        }
+    }
+
+    &__characterName,
+    &__message {
+        position: absolute;
+        bottom: 20%;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        line-height: 1;
+        font-size: 24px;
+        font-weight: bold;
+        z-index: 1;
+        color: #fff;
+        text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+        caret-color: red;
+        background-color: transparent;
+        border: none;
+
+        &--focus {
+            box-shadow: 0 0 12px red;
         }
     }
 

@@ -3,6 +3,7 @@ import { getFilenameFromPath } from '@/utils'
 import { onMounted, ref } from 'vue'
 import { useMainStore } from '@/stores/mainStore'
 import Button from '@/components/Button.vue'
+import MessageWindow from '@/components/MessageWindow.vue'
 
 const store = useMainStore()
 </script>
@@ -11,20 +12,7 @@ const store = useMainStore()
     <div class="Aside">
         <div class="Aside__header"></div>
         <div class="Aside__inner">
-            <h1 class="Aside__heading">メッセージウインドウ</h1>
-            <Button text="全コピ" color="gray" />
-            <div
-                v-for="n in 20"
-                style="
-                    background-color: #fff;
-                    padding: 20px 50px;
-                    margin: 20px 0;
-                    font-size: 30px;
-                    color: #000;
-                "
-            >
-                あああ
-            </div>
+            <MessageWindow />
         </div>
     </div>
 </template>

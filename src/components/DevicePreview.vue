@@ -6,9 +6,10 @@ import DevicePreviewItem from '@/components/DevicePreviewItem.vue'
 
 const store = useMainStore()
 
+const itemWidth = 500
 const width = computed(() => {
     return {
-        width: `${store.devicePreviewItems.length * 300}px`,
+        width: `${store.devicePreviewItems.length * (itemWidth + 24)}px`,
     }
 })
 console.log('devicePreviewItems:', store.devicePreviewItems)
@@ -16,7 +17,10 @@ console.log('devicePreviewItems:', store.devicePreviewItems)
 
 <template>
     <div class="DevicePreview">
-        <ol class="DevicePreview__items" :style="width">
+        <ol
+            class="DevicePreview__items"
+            :style="{ '--item-width': itemWidth + 'px', ...width }"
+        >
             <li
                 class="DevicePreview__item"
                 v-for="(item, index) in store.devicePreviewItems"
@@ -40,7 +44,7 @@ console.log('devicePreviewItems:', store.devicePreviewItems)
     }
 
     &__item {
-        width: 300px;
+        width: var(--item-width);
         height: 100%;
     }
 }
